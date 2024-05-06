@@ -1,6 +1,6 @@
 Návod na spuštění
 
-1) Pro spuštění je třeba mít nainstalován v počítači Python.
+1) Pro spuštění je třeba mít nainstalován v počítači Python (verze 3.11.9).
 2) Pomocí příkazu python3 -m venv .env je nutné vytvořit si virtuální prostředí.
 3) Nainstalovat balicky z vyse uvedeneho source .env/bin/activate && pip install -r requirements.txt, které jsou v repozitáři.
 4) Potí zadat příkaz flask --run.
