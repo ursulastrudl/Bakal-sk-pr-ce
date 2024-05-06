@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html> 
+<head>
+    <title>Guide - Inventory Management Optimization</title>
+    <meta charset="UTF-8">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/application_style.css') }}" media="screen">
+</head>
+<body> 
+<div class="container-fluid">
+    <div id="mainTitle">
+        <h1>User Guide for the Application</h1>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" id="hide_buttons" onclick="showApp()">Back</button>
+    <p></p>
+    <h2>Description of the Application</h2>
+    <p>The application is designed to optimize inventory management in your business. Based on input data, it can calculate order storage costs. Furthermore, based on the input data, it can generate
+        an optimal order for the given business.</p>
+    <h2>Uploading Input Data</h2>
+    <p>Data is uploaded directly into the application from the user's device using a graphical user interface.</p>
+    <h3>Data Format</h3>
+    <p>Users input three CSV files into the application. All files must be delimited by semicolons and encoded in UTF-8.</p>
+    <p>The demand file must contain a column named "product". Other columns must contain numbers indicating consumption quantities on specific days. Based on this file, the application determines the probabilistic distribution of consumption/demand for each individual product.</p>
+    <p>Furthermore, users upload a CSV file containing their current inventory levels. It must contain three columns. The first column must again contain the product name, the second its current quantity in stock, and the third its acquisition cost.</p>
+    <p>The third file relates to quantity discounts. It contains three columns - the first specifies the lower boundary of the discount group, the second the upper boundary, and the third the discount itself.</p>
+    <p>If users want to use decimal numbers in the CSV file, they must use a decimal point.</p>
+    <p>Additionally, users must enter the procurement lead time (time from order creation to delivery), interest rate (by which storage costs are increased) in percentage, procurement costs (usually transportation fees) in the currency used, and service level.
+        The service level signifies the probability of customer satisfaction and is expressed in percentages. Therefore, the higher the percentage (e.g., 90), the higher the probability that there will be no stockouts.</p>
+
+    <h2>Calculation of Required Data</h2>
+    <p>Users can compute necessary functions using various buttons.</p>
+    <h3>Probabilistic Distribution</h3>
+    <p>To determine the probabilistic distribution, users need to upload a CSV file containing consumption/demand for products into the application. Then, users can use the buttons "Show Histogram with Probabilistic Distribution" and "Show Q-Q Plot with Probabilistic Distribution" to display both a histogram and a Q-Q plot of the uploaded data. Alternatively, they can click the "Determine Probabilistic Distribution" button to view the statistical tests indicating the probability distribution of each product demand.</p>
+    <h3>Inventory Holding Costs</h3>
+    <p>To calculate inventory holding costs, users need to upload a CSV file containing their inventory levels and the loan interest rate. They can then click the "Calculate Inventory Holding Costs" button to display storage costs for each product and their sum.</p>
+    <h3>Reorder Point and Sample Standard Deviation</h3>
+    <p>Reorder point can be calculated either based on current inventory levels or at a chosen reorder level. To calculate the reorder point based on current inventory levels, users need to upload a CSV file containing consumption and procurement lead time. The reorder point will correspond to a 50% service level. The function can also compute the sample standard deviation of product demand. If users want to calculate the reorder point at a chosen service level, they must provide that level.</p>
+
+    <h3>Generating Optimal Order</h3>
+    <p>To generate an optimal order, users must upload the following data:
+        <ul>
+            <li>CSV file containing product demand</li>
+            <li>CSV file containing inventory levels</li>
+            <li>Loan interest rate</li>
+            <li>Procurement lead time</li>
+            <li>Procurement costs</li>
+        </ul>
+    </p>
+    <h3>Downloading Resulting File</h3>
+    <p>After clicking the button to generate an optimal order, users can download the order in XLSX format.</p>
+    <p>If users want to generate an optimal order using quantity discounts, they must also upload a CSV file containing quantity discounts along with the above data.</p>
+</div>
+
+<script>
+    function showApp() {
+        window.open('/show_app', '_blank');
+    }
+</script>
+
+</body> 
+</html>

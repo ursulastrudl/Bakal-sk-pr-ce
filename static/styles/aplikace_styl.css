@@ -1,0 +1,61 @@
+
+body {
+    background-color: #C0C5C1;
+    color: white;
+}
+
+
+.container-fluid {
+    background-color: #5b5e62; 
+    border-radius: 10px; 
+    padding: 50px;
+    margin-top: 20px; 
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    
+  
+}
+
+.table-container {
+    overflow-x: auto; /* Add horizontal scroll for large tables */
+    margin: auto; /* Center-align the container */
+}
+table {
+    width: 80%; 
+    border-collapse: collapse; 
+}
+th, td {
+    padding: 8px; 
+    text-align: left; 
+    border-bottom: 1px solid #000000; 
+    background-color: #5b5e62;
+}
+th {
+    background-color: #5b5e62;
+}
+
+/* .btn-primary {
+    background-color: #574B60 !important;
+    border-color: #574B60 !important;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary {
+    
+    background-color: #38313d  !important;
+    border-color: #38313d   !important; /*set the color you want here*/
+
+
+#vypocetNadpis h2 {
+margin-top: 40px;
+margin-bottom: 40px;
+color: #ffffff;
+height: 100%;
+
+}
+#hlavniNadpis h1 {
+color: #ffffff;
+text-align: center;
+height: 100%;
+
+}

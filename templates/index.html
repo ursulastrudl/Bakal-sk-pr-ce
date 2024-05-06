@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Optimalizace řízení zásob</title>
+    <meta charset="UTF-8">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/aplikace_styl.css') }}"
+        media="screen">
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div id="hlavniNadpis">
+            <h1>Aplikace pro optimalizaci řízení zásob</h1>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 ml-auto">
+                <div class="btn-group btn-block mt-3" role="group">
+                    <button type="button" class="btn btn-primary btn-sm" id="switch_language"
+                        onclick="switchLanguage()">English version</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="instructions"
+                        onclick="openInstructions()">Návod</button>
+                </div>
+                <form id="price_discount_existence_form" enctype="multipart/form-data" class="mt-3">
+                    <div class="form-group row align-items-center">
+                        <label for="price_discount_existence_text" id="price_discount_existence"
+                            class="col-sm-4 col-form-label">Používáte diskontní rabaty?</label>
+                        <div class="col-sm-8">
+                            <div class="btn-group btn-block" role="group" aria-label="Discounts">
+                                <button type="button" class="btn btn-primary btn-sm flex-fill" id="discount_usage_yes"
+                                    onclick="showDiscountForm(true)">Ano</button>
+                                <button type="button" class="btn btn-primary btn-sm flex-fill" id="discount_usage_no"
+                                    onclick="showDiscountForm(false)">Ne</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <!-- Formulář pro nahrání souboru -->
+            <div class="col-md-4">
+                <form id="inventory_form" enctype="multipart/form-data">
+                    <div class="form-group row">
+                        <label for="inventory_file_text" id="inventory_file" class="col-sm-12 col-form-label">Zde
+                            nahrajte skladové zásoby</label>
+                        <div class="col-sm-12">
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="inventory_file_text"
+                                        name="inventory_file" accept=".csv">
+                                    <label class="custom-file-label" for="inventory_file_text"
+                                        data-browse="Procházet">Vybrat soubor</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" id="upload_inventory_button" class="btn btn-primary btn-block"
+                        onclick="uploadInventory()">Nahrát data</button>
+                </form>
+            </div>
+
+              <!-- Formulář pro nahrání souboru -->
+            <div class="col-md-4">
+                <form id="demand_form" enctype="multipart/form-data">
+                    <div class="form-group row">
+                        <label for="demand_file_text" id="demand_file" class="col-sm-12 col-form-label">Zde nahrajte
+                            poptávku po produktech</label>
+                        <div class="col-sm-12">
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="demand_file_text"
+                                        name="demand_file" accept=".csv">
+                                    <label class="custom-file-label" for="demand_file_text"
+                                        data-browse="Procházet">Vybrat soubor</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" id="upload_demand_button" class="btn btn-primary btn-block"
+                        onclick="uploadDemand()">Nahrát data</button>
+                </form>
+            </div>
+
+             <!-- Formulář pro nahrání souboru -->
+            <div class=" col-md-4" id="price_discount_form_visibility" style="display: none;">
+                <form id="price_discount_form" enctype="multipart/form-data">
+                    <div class="form-group row">
+                        <label for="price_discount_file_text" id="price_discount_file"
+                            class="col-sm-12 col-form-label">Zde nahrajte množstevní slevy</label>
+                        <div class="col-sm-12">
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="price_discount_file_text"
+                                        name="price_discount_file" accept=".csv">
+                                    <label class="custom-file-label" for="price_discount_file_text"
+                                        data-browse="Procházet">Vybrat soubor</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" id="upload_price_discount_button" class="btn btn-primary btn-block"
+                        onclick="uploadPriceDiscount()">Nahrát data</button>
+                </form>
+            </div>
+        </div>
+  <!-- Formulář pro ukázání dat -->
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <form>
+                    <button type="button" style="min-height: 62px;" class="btn btn-primary btn-block custom-btn"
+                        id="show_inventory" onclick="showInventoryData()" disabled>Ukázat nahraný soubor se skladovými
+                        zásobami</button>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <form>
+                    <button type="button" style="min-height: 62px;" class=" btn btn-primary btn-block custom-btn"
+                        id="show_demand" onclick="showDemandData()" disabled>Ukázat nahraný soubor s poptávkou</button>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <form>
+                    <button type="button" class="btn btn-primary btn-block custom-btn" id="show_discount"
+                        style="display: none; min-height: 62px;" onclick="showDiscountData()" disabled>Ukázat nahraný
+                        soubor s
+                        množstevními slevami</button>
+                </form>
+            </div>
+        </div>
+        <!-- Formuláře pro nahrání potřebných údajů -->
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <form>
+                    <div class="form-group row">
+                        <label for="serviceInput" class="col-sm-8 col-form-label">Úroveň obsluhy</label>
+                        <div class="col-sm-4">
+                            <input type="number" id="serviceInput" class="form-control" value="1">
+                        </div>
+                    </div>
+                    <button type="button" id="submit_service" class="btn btn-primary btn-block custom-btn"
+                        onclick="submitService()">Potvrdit</button>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <form>
+                    <div class="form-group row">
+                        <label for="integerInput" class="col-sm-8 col-form-label">Pořizovací lhůta</label>
+                        <div class="col-sm-4">
+                            <input type="number" id="integerInput" class="form-control" value="1">
+                        </div>
+                    </div>
+                    <button type="button" id="submit_delivery" class="btn btn-primary btn-block custom-btn"
+                        onclick="submitDelivery()">Potvrdit</button>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <form>
+                    <div class="form-group row">
+                        <label for="floatInput" class="col-sm-8 col-form-label">Úroková míra z půjčky</label>
+                        <div class="col-sm-4">
+                            <input type="number" id="floatInput" class="form-control" value="1">
+                        </div>
+                    </div>
+                    <button type="button" id="submit_percentage" class="btn btn-primary btn-block custom-btn"
+                        onclick="submitPercentage()">Potvrdit</button>
+                </form>
+            </div>
+            <div class="col-md-4 mt-3">
+                <form id="delivery_fee_form">
+                    <div class="form-group row">
+                        <label for="feeInput" id="product_cost" class="col-sm-8 col-form-label">Pořizovací náklady (cena
+                            za dopravu)</label>
+                        <div class="col-sm-4">
+                            <input type="number" id="feeInput" class="form-control" value="1">
+                        </div>
+                    </div>
+                    <button type="button" id="submit_delivery_fee" class="btn btn-primary btn-block custom-btn"
+                        onclick="submitDeliveryFee()">Potvrdit</button>
+                </form>
+            </div>
+        </div>
+ <!-- Sekce s tlačítky pro výpočet -->
+        <div id="vypocetNadpis">
+            <h2>Výpočet potřebných hodnot</h2>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <button type="button" class="btn btn-primary btn-sm" id="hide_buttons"
+                    onclick="buttonVisibility()">Skrýt tlačítka</button>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6 mt-3">
+                <form>
+                    <button type="button" class="btn btn-primary btn-block" id="show_histogram"
+                        onclick="showHistogram()" disabled>Ukázat histogram s pravděpodobnostním rozdělením</button>
+                </form>
+            </div>
+
+            <div class="col-md-6 mt-3">
+                <form>
+                    <button type="button" class="btn btn-primary btn-block" id="show_qq_plot" onclick="showQQPlot()"
+                        disabled>Ukázat QQ graf s pravděpodobnostním rozdělením</button>
+                </form>
+            </div>
+
+            <div class="col-md-6 mt-3">
+                <form>
+                    <button type="button" class="btn btn-primary btn-block" id="calculate_distribution"
+                        onclick="calculateDistribution()" disabled>Určit pravděpodobnostní rozdělení</button>
+                    <div id="distribution_result"></div>
+                </form>
+            </div>
+            <div class="col-md-6 mt-3">
+                <form>
+                    <button type="button" class="btn btn-primary btn-block" id="statistics_values"
+                        onclick="calculateStatistics()" disabled>Vypočítat bod znovuobjednávky a odchylku</button>
+                    <div id="statistics_result"></div> <!-- Empty div to display distribution result -->
+                </form>
+            </div>
+
+            <div class="col-md-6 mt-3">
+                <form>
+                    <button type="button" class="btn btn-primary btn-block" id="storage_costs" onclick="storageCosts()"
+                        disabled>Vypočítat skladovací náklady</button>
+                    <div id="storage_costs_result"></div>
+                </form>
+            </div>
+
+            <div class="col-md-6 mt-3">
+                <form>
+                    <button type="button" class="btn btn-primary btn-block" id="optimal_reorder"
+                        onclick="calculateServiceQuantity()" disabled>Vypočítat bod znovuobjednávky při zvolené úrovni
+                        obsluhy</button>
+                    <div id="service_quantities_result"></div> <!-- Empty div to display distribution result -->
+                </form>
+            </div>
+
+            <div class="col-md-6 mt-3">
+                <form>
+                    <button type="button" class="btn btn-primary btn-block" id="optimal_quantities"
+                        onclick="calculateOptimalQuantity()" disabled>Vypočítat optimální objednávku</button>
+                    <div id="optimal_quantities_result"></div> <!-- Empty div to display distribution result -->
+                </form>
+
+            </div>
+
+            <div class="col-md-6 mt-3" style="display: none;">
+                <form>
+                    <button type="button" class="btn btn-primary btn-block" id="optimal_quantities_discount"
+                        onclick="calculateOptimalDiscountQuantity()" disabled>Vypočítat optimální
+                        objednávku</button>
+                    <div id="optimal_quantities_discount_result"></div>
+                </form>
+            </div>
+
+            <div class="col-md-6 mt-3">
+                <button type="button" class="btn btn-primary btn-block" id="download_button" onclick="downloadXLSX()"
+                    disabled>Stáhnout optimální objednávku</button>
+                <div id="optimal-quantities"></div>
+            </div>
+        </div>
+</body>
+
+</html>
+
+
+<script>
+// zobrazení formuláře pro diskontní rabaty
+    function showDiscountForm(isDiscountUsed) {
+        var discountForm = $('#price_discount_form_visibility');
+        var optimal_quantities_btn = $('#optimal_quantities');
+        var optimal_quantities_discount_btn = $('#optimal_quantities_discount');
+        var show_discount_file = $('#show_discount');
+
+        if (isDiscountUsed) {
+
+            discountForm.show();
+            optimal_quantities_btn.closest("div").hide();
+            optimal_quantities_discount_btn.closest("div").show();
+            show_discount_file.show();
+
+        } else {
+
+            discountForm.hide();
+            optimal_quantities_btn.closest("div").show();
+            optimal_quantities_discount_btn.closest("div").hide();
+            show_discount_file.hide();
+        }
+    }
+// zobrazení návodu
+    function openInstructions() {
+        var button = $('#switch_language');
+        if (button.text() === 'English version') {
+            window.open('/instructions/czech', '_blank');
+        } else {
+            window.open('/instructions/english', '_blank');
+        }
+
+
+    }
+    // viditelnost tlačítek
+    function buttonVisibility() {
+        var calculateButton = $('#calculate_distribution');
+        var statisticsButton = $('#statistics_values');
+        var toggleButton = $('#hide_buttons');
+        var qqPlot = $('#show_qq_plot');
+        var histogram = $('#show_histogram');
+        var switchLanguageButton = $('#switch_language');
+
+
+        if (switchLanguageButton.text() === 'English version') {
+            if (calculateButton.is(':visible') && statisticsButton.is(':visible')) {
+                // Hide buttons
+                calculateButton.hide();
+                statisticsButton.hide();
+                qqPlot.hide();
+                histogram.hide();
+                toggleButton.text('Zobrazit tlačítka');
+            } else {
+                // Show buttons
+                calculateButton.show();
+                statisticsButton.show();
+                qqPlot.show();
+                histogram.show();
+                toggleButton.text('Skrýt tlačítka');
+            }
+        } else {
+            if (calculateButton.is(':visible') && statisticsButton.is(':visible')) {
+                // Hide buttons
+                calculateButton.hide();
+                statisticsButton.hide();
+                qqPlot.hide();
+                histogram.hide();
+                toggleButton.text('Show buttons'); 
+            } else {
+                
+
+                calculateButton.show();
+                statisticsButton.show();
+                qqPlot.show();
+                histogram.show();
+                toggleButton.text('Hide buttons'); 
+            }
+        }
+    }
+
+
+//zobrazení názvu vybraného souboru ve formuláři
+    $('#inventory_file_text').on('change', function () {
+        var fileName = $(this).val().split('\\').pop(); 
+        $(this).next('.custom-file-label').html(fileName); 
+    });
+
+    $('#demand_file_text').on('change', function () {
+        var fileName = $(this).val().split('\\').pop(); 
+        $(this).next('.custom-file-label').html(fileName); 
+    });
+
+    $('#price_discount_file_text').on('change', function () {
+        var fileName = $(this).val().split('\\').pop(); 
+        $(this).next('.custom-file-label').html(fileName);
+    });
+
+// nahrání množstevního rabatu
+    function uploadPriceDiscount() {
+        var form_data = new FormData($('#price_discount_form')[0]);
+        var button = $('#switch_language');
+
+        // Check if a file has been selected
+        if ($('#price_discount_form input[type=file]').get(0).files.length === 0) {
+            if (button.text() === 'English version') {
+                alert('Prosím vyberte soubor.');
+            } else {
+                alert('Please select a file.');
+            }
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/upload_price_discount',
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response) {
+
+                    if (response.success) {
+                        $('#optimal_quantities_discount').data('discountUploaded', true);
+                        $('#show_discount').data('discountUploaded', true);
+                        checkButtonEnable();
+
+                        if (button.text() === 'English version') {
+                            alert('Data nahrána úspěšně!');
+                        } else {
+                            alert('Price discount data uploaded successfully!');
+                        }
+                    } else {
+                        // Handle error due to column validation
+                        var errorMessage = (button.text() === 'English version') ?
+                            'Chyba: CSV soubor musí mít přesně tři sloupce a může obsahovat pouze čísla' :
+                            'Error: Uploaded file must have exactly three columns and contain numbers only';
+                        alert(errorMessage);
+                    }
+
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error uploading file:', error);
+                    alert('Error uploading file. Please try again.');
+                }
+            });
+        }
+    }
+
+
+// nahrání skladových zásob
+    function uploadInventory() {
+        var form = $('#inventory_form')[0];
+        var form_data = new FormData(form);
+        var button = $('#switch_language');
+
+        // Check if a file has been selected
+        if (form_data.get('inventory_file').size === 0) {
+            if (button.text() === 'English version') {
+                alert('Prosím vyberte soubor.');
+            } else {
+                alert('Please select a file.');
+            }
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/upload_inventory',
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response) {
+                    if (response.success) {
+                        $('#storage_costs').data('inventorySubmitted', true);
+                        $('#optimal_quantities').data('inventorySubmitted', true);
+                        $('#optimal_quantities_discount').data('inventorySubmitted', true);
+                        $('#show_inventory').data('inventorySubmitted', true);
+                        checkButtonEnable();
+                        var successMessage = (button.text() === 'English version') ?
+                            'Data nahrána úspěšně!' : 'Inventory data uploaded successfully!';
+                        alert(successMessage);
+                    } else {
+                        // Handle error
+                        var errorMessage = (button.text() === 'English version') ?
+                            'Chyba: CSV soubor musí mít přesně tři sloupce' :
+                            'Error: Uploaded file must have exactly three columns';
+                        alert(errorMessage);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error uploading file:', error);
+                    alert('Error uploading file. Please try again.');
+                }
+            });
+        }
+    }
+
+
+// nahrání poptávky
+    function uploadDemand() {
+        var form_data = new FormData($('#demand_form')[0]);
+        var button = $('#switch_language');
+
+        // Check if a file has been selected
+        if ($('#demand_form input[type=file]').get(0).files.length === 0) {
+            if (button.text() === 'English version') {
+                alert('Prosím vyberte soubor.');
+            } else {
+                alert('Please select a file.');
+            }
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/upload_demand',
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (response) {
+
+                    if (response.success) {
+                        $('#calculate_distribution').data('demandUploaded', true);
+                        $('#show_qq_plot').data('demandUploaded', true);
+                        $('#show_histogram').data('demandUploaded', true);
+                        $('#statistics_values').data('demandUploaded', true);
+                        $('#optimal_reorder').data('demandUploaded', true);
+                        $('#optimal_quantities').data('demandUploaded', true);
+                        $('#optimal_quantities_discount').data('demandUploaded', true);
+
+
+                        checkButtonEnable();
+
+                        if (button.text() === 'English version') {
+                            alert('Data nahrána úspěšně!');
+                        } else {
+                            alert('Price discount data uploaded successfully!');
+                        }
+                    } else {
+                        // Handle error due to column validation
+                        var errorMessage = (button.text() === 'English version') ?
+                            'Chyba: CSV soubor musí mít přesně tři sloupce a může obsahovat pouze čísla' :
+                            'Error: Uploaded file must have exactly three columns and contain numbers only';
+                        alert(errorMessage);
+                    }
+
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error uploading file:', error);
+                    alert('Error uploading file. Please try again.');
+                }
+            });
+        }
+    }
+
+
+
+// nahrání procentuální částky 
+    function submitPercentage() {
+        var floatValue = $('#floatInput').val();
+        var button = $('#switch_language');
+
+        if (floatValue === "") {
+            if (button.text() === 'English version') {
+                alert('Prosím nahrajte úroková procenta.');
+            } else {
+                alert('Please enter a percentage rate.');
+            }
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/submit_percentage',
+                data: JSON.stringify({ floatValue: floatValue }),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.success) {
+                        $('#storage_costs').data('percentageSubmitted', true);
+                        $('#optimal_quantities').data('percentageSubmitted', true);
+                        $('#optimal_quantities_discount').data('percentageSubmitted', true);
+
+                        checkButtonEnable();
+
+                        var button = $('#switch_language');
+                        if (button.text() === 'English version') {
+                            alert('Data nahrána úspěšně!');
+                        } else {
+                            alert('Percentage rate of charge uploaded successfully!');
+
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+
+// nahrání  dopravy
+    function submitDeliveryFee() {
+        var feeValue = $('#feeInput').val();
+        var button = $('#switch_language');
+        if (feeValue === "") {
+            if (button.text() === 'English version') {
+                alert('Prosím nahrajte pořizovací náklady.');
+            } else {
+                alert('Please enter acquisition costs.');
+            }
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/submit_delivery_fee',
+                data: JSON.stringify({ feeValue: feeValue }),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.success) {
+                        $('#optimal_quantities').data('feeUploaded', true);
+                        $('#optimal_quantities_discount').data('feeUploaded', true);
+
+
+                        checkButtonEnable(); // Check if both tasks are completed
+                        if (button.text() === 'English version') {
+                            alert('Data nahrána úspěšně!');
+                        } else {
+                            alert('Delivery data uploaded successfully!');
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+// nahrání doručovací doby
+    function submitDelivery() {
+        var integerValue = $('#integerInput').val();
+        var button = $('#switch_language');
+
+        if (integerValue === "") {
+            if (button.text() === 'English version') {
+                alert('Prosím nahrajte pořizovací lhůtu.');
+            } else {
+                alert('Please enter a delivery time.');
+            }
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/submit_delivery',
+                data: JSON.stringify({ integerValue: integerValue }),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.success) {
+                        $('#optimal_reorder').data('deliverySubmitted', true);
+                        $('#statistics_values').data('deliverySubmitted', true);
+                        $('#optimal_quantities').data('deliverySubmitted', true);
+                        $('#optimal_quantities_discount').data('deliverySubmitted', true);
+
+                        checkButtonEnable(); // Check if both tasks are completed
+                        if (button.text() === 'English version') {
+                            alert('Data nahrána úspěšně!');
+                        } else {
+                            alert('Delivery data uploaded successfully!');
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+// zpřístupnění tlačítek
+    function checkButtonEnable() {
+        if ($('#show_histogram').data('demandUploaded')) {
+            $('#show_histogram').prop('disabled', false);
+        }
+        if ($('#show_qq_plot').data('demandUploaded')) {
+            $('#show_qq_plot').prop('disabled', false);
+        }
+        // Enable the button only if both tasks are completed
+        if ($('#statistics_values').data('demandUploaded') && $('#statistics_values').data('deliverySubmitted')) {
+            $('#statistics_values').prop('disabled', false);
+        }
+        if ($('#calculate_distribution').data('demandUploaded')) {
+            $('#calculate_distribution').prop('disabled', false);
+            $('#show_demand').prop('disabled', false);
+        }
+
+        if ($('#show_inventory').data('inventorySubmitted')) {
+            $('#show_inventory').prop('disabled', false);
+        }
+
+        if ($('#show_discount').data('discountUploaded')) {
+            $('#show_discount').prop('disabled', false);
+        }
+
+        if ($('#storage_costs').data('inventorySubmitted') && $('#storage_costs').data('percentageSubmitted')) {
+            $('#storage_costs').prop('disabled', false);
+        }
+
+        if ($('#optimal_reorder').data('serviceSubmitted') && $('#optimal_reorder').data('deliverySubmitted') && $('#optimal_reorder').data('demandUploaded')) {
+            $('#optimal_reorder').prop('disabled', false);
+        }
+        if ($('#optimal_quantities').data('demandUploaded') && $('#optimal_quantities').data('inventorySubmitted') && $('#optimal_quantities').data('percentageSubmitted') && $('#optimal_quantities').data('deliverySubmitted') && $('#optimal_quantities').data('feeUploaded')) {
+            $('#optimal_quantities').prop('disabled', false);
+
+        }
+        if ($('#optimal_quantities_discount').data('demandUploaded') && $('#optimal_quantities_discount').data('inventorySubmitted') && $('#optimal_quantities_discount').data('percentageSubmitted') && $('#optimal_quantities_discount').data('deliverySubmitted') && $('#optimal_quantities_discount').data('feeUploaded') && $('#optimal_quantities_discount').data('discountUploaded')) {
+            $('#optimal_quantities_discount').prop('disabled', false);
+        }
+
+    }
+// nahrání úrovně obsluhy
+    function submitService() {
+        var integerValue = $('#serviceInput').val();
+        var button = $('#switch_language');
+
+        if (integerValue === "") {
+            if (button.text() === 'English version') {
+                alert('Prosím zadejte požadovanou úroveň obsluhy.');
+
+            } else {
+                alert('Please enter required service level.');
+            }
+        } else {
+            var serviceValue = $('#serviceInput').val();
+            $.ajax({
+                type: 'POST',
+                url: '/submit_service',
+                data: JSON.stringify({ serviceValue: serviceValue }),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.success) {
+                        $('#optimal_reorder').data('serviceSubmitted', true);
+                        checkButtonEnable();
+                        var button = $('#switch_language');
+                        if (button.text() === 'English version') {
+                            alert('Data nahrána úspěšně!');
+
+                        }
+                        else {
+                            alert('Delivery data uploaded successfully!');
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+// zobrazení histogramu
+    function showHistogram(button) {
+        var button = $('#switch_language');
+        var language = (button.text() === 'English version') ? 'Czech' : 'English';
+        $.ajax({
+            type: 'GET',
+            url: '/histogram',
+            data: { 'language': language },
+            success: function (response) {
+                // Open a new window
+                var newWindow = window.open('', '_blank');
+                newWindow.document.write('<html><head><title>Histograms</title></head><body>');
+
+               
+                response.image_data.forEach(function (image) {
+                    newWindow.document.write('<img src="' + image + '" /><hr>');
+                });
+
+                newWindow.document.write('</body></html>');
+            },
+            error: function (xhr, status, error) {
+                alert('Error occurred while loading histogram: ' + error);
+            }
+        });
+    }
+// zobrazení QQ Grafu
+    function showQQPlot(button) {
+        var button = $('#switch_language');
+        var language = (button.text() === 'English version') ? 'Czech' : 'English';
+        $.ajax({
+            type: 'GET',
+            url: '/qqplot',
+            data: { 'language': language },
+            success: function (response) {
+                // Open a new window
+                var newWindow = window.open('', '_blank');
+                newWindow.document.write('<html><head><title>QQ Plots</title></head><body>');
+
+                // Add each QQ plot to the new window
+                response.image_data.forEach(function (image) {
+                    newWindow.document.write('<img src="' + image + '" /><hr>');
+                });
+
+                newWindow.document.write('</body></html>');
+            },
+            error: function (xhr, status, error) {
+                alert('Error occurred while loading QQ plot: ' + error);
+            }
+        });
+    }
+
+
+// zobrazení rozdělení
+    function calculateDistribution() {
+        $.ajax({
+            type: 'GET',
+            url: '/calculate_distribution',
+            success: function (response) {
+                var button = $('#switch_language');
+                var distributionHtml = "<p> <ul>";
+                var hasNonNormDistribution = false;
+                var productNameText = "";
+                var bestDistributionText = "";
+                var distributionCalculationCompletedText = "";
+                var distributionNotNormText = "";
+
+                if (button.text() === 'English version') {
+                    productNameText = "Produkt: ";
+                    bestDistributionText = "Nejlepší rozdělení: ";
+                    distributionCalculationCompletedText = "Výpočet rozdělení dokončen.";
+                    distributionNotNormText = "Aplikace počítá s normálním rozdělením";
+
+                } else {
+                    productNameText = "Product: ";
+                    bestDistributionText = "Best distribution: ";
+                    distributionCalculationCompletedText = "Distribution calculation completed.";
+                    distributionNotNormText = "The application expects normal distribution.";
+
+                }
+
+                for (var product in response.distribution_result) {
+                    distributionHtml += "<li>" + productNameText + product + ", " + bestDistributionText + response.distribution_result[product] + "</li>";
+                    if (response.distribution_result[product] !== 'norm') {
+                        hasNonNormDistribution = true;
+                    }
+                }
+                distributionHtml += "</ul>";
+
+                if (hasNonNormDistribution) {
+                    distributionHtml += "<p>" + distributionNotNormText + "</p>";
+                } else {
+                    distributionHtml += "<p>" + distributionCalculationCompletedText + "</p>";
+                }
+
+                $('#distribution_result').html(distributionHtml);
+            },
+            error: function (xhr, status, error) {
+                $('#distribution_result').html("Error: " + error);
+            }
+        });
+    }
+// zobrazení skladovacích nákladů
+    function storageCosts() {
+        $.ajax({
+            type: 'GET',
+            url: '/storage_costs',
+            success: function (response) {
+                console.log(response);
+                var button = $('#switch_language');
+                var costsHtml = "<p> <ul>";
+                var storageCostsText = "";
+                var productNameText = "";
+                var sumStorageCosts = 0; // Initialize sum of storage costs
+
+                if (button.text() === 'English version') {
+                    storageCostsText = "Skladovací náklady: ";
+                    productNameText = "Produkt: ";
+                    sumStorageCostsText = "Celkové skladovací náklady: ";
+
+                } else {
+                    storageCostsText = "Storage costs: ";
+                    productNameText = "Product: ";
+                    sumStorageCostsText = "Sum of storage costs: ";
+
+                }
+
+                // Check if storage_costs_show is present in the response
+                if (response.storage_costs) {
+                    // Loop through each product in the storage_costs_show dictionary
+                    for (var product in response.storage_costs) {
+                        var storageCost = parseFloat(response.storage_costs[product]).toFixed(2);
+                        costsHtml += "<li>" + productNameText + product + ", " + storageCostsText + storageCost + "</li>";
+
+                        // Accumulate the storage costs for the sum
+                        sumStorageCosts += parseFloat(storageCost);
+                    }
+
+                    // Add the sum of storage costs to the HTML
+                } else {
+                    // Display an error message if storage_costs_show is not present in the response
+                    costsHtml += "<li>No storage costs data available</li>";
+                }
+
+                costsHtml += "</ul>";
+                costsHtml += sumStorageCostsText + sumStorageCosts.toFixed(2);
+
+                $('#storage_costs_result').html(costsHtml);
+            },
+            error: function (xhr, status, error) {
+                $('#storage_costs_result').html("Error: " + error);
+            }
+        });
+    }
+
+
+
+// zobrazení sstatistických údajů
+    function calculateStatistics() {
+        $.ajax({
+            type: 'GET',
+            url: '/calculate_statistics',
+            success: function (response) {
+                var button = $('#switch_language');
+                var statisticsHtml = "<p> <ul>";
+                var meanText = "";
+                var stdDevText = "";
+                var productNameText = "";
+
+                if (button.text() === 'English version') {
+                    meanText = "Bod znovuobjednávky: ";
+                    stdDevText = "Výběrová odchylka: ";
+                    productNameText = "Produkt: ";
+                    reorderText = "Bod znovuobjednávky produktů odpovídá bodu znovuobjednávky při úrovni obsluhy 50%."
+
+                } else {
+                    meanText = "Reorder point: ";
+                    stdDevText = "Standard Deviation: ";
+                    productNameText = "Product: ";
+                    reorderText = "The product reorder point corresponds to the reorder point at a service level of 50% "
+                }
+
+                for (var product in response.statistics_show) {
+                    statisticsHtml += "<li>" + productNameText + product + ", " + meanText + response.statistics_show[product].mean_show + ", " + stdDevText + response.statistics_show[product].std_dev_show + "</li>";
+                }
+
+
+
+                statisticsHtml += "</ul>";
+                statisticsHtml += "<p>" + reorderText + "</p>";
+                $('#statistics_result').html(statisticsHtml);
+            },
+            error: function (xhr, status, error) {
+
+                var errorMessage = "Error";
+                var button = $('#switch_language');
+                if (xhr.status === 400) {
+                    // Bad Request - Possibly due to insufficient or incorrect data
+                    if (button.text() === 'English version') {
+                        errorMessage = "Chyba: Nedostatečná nebo nesprávná data.";
+                    } else {
+                        errorMessage = "Error: Insufficient or incorrect data.";
+                    }
+                } else if (xhr.status === 500) {
+                    // Internal Server Error
+                    if (button.text() === 'English version') {
+                        errorMessage = "Chyba: Nedostatečná nebo nesprávná data.";
+                    } else {
+                        errorMessage = "Error: Insufficient or incorrect data.";
+                    }
+                } else {
+                    // Other errors
+                    var responseMessage = xhr.responseText ? JSON.parse(xhr.responseText).message : "";
+                    errorMessage += ": " + (responseMessage || xhr.statusText);
+                }
+
+                $('#statistics_quantities_result').html(errorMessage);
+            }
+        });
+    }
+
+    // výpočet optimálního množství s rabaty
+
+    function calculateOptimalDiscountQuantity() {
+        var button = $('#switch_language');
+        var language = (button.text() === 'English version') ? 'Czech' : 'English';
+
+        $.ajax({
+            type: 'GET',
+            url: '/calculate_optimal_discount_quantity',
+            data: { 'language': language },
+            success: function (response) {
+                var button = $('#switch_language');
+                var quantitiesHtml = "<p>Optimal Order Details:</p><ul>";
+                $('#download_button').prop('disabled', false);
+
+                // Display the optimal order details for the best discount rate
+                var optimalQuantities = response.optimal_quantities;
+                for (var product in optimalQuantities) {
+                    if (optimalQuantities.hasOwnProperty(product)) {
+                        var productNameText = (button.text() === 'Czech version') ? "Product: " : "Produkt: ";
+                        var optimalQuantityText = (button.text() === 'Czech version') ? "Optimal Quantity: " : "Optimální množství: ";
+                        var quantity = optimalQuantities[product];
+                        quantitiesHtml += "<li>" + productNameText + product + ", " + optimalQuantityText + quantity + "</li>";
+                    }
+                }
+                quantitiesHtml += "</ul>";
+                var discountRateText = (button.text() === 'English version') ? "Discount Rate Used: " : "Použitá sleva: ";
+                var discountRate = response.used_rate;
+                quantitiesHtml += "<p><strong>" + discountRateText + "</strong>" + discountRate + "%</p>";
+
+                $('#optimal_quantities_discount_result').html(quantitiesHtml);
+            }
+
+        });
+    }
+    
+
+
+
+
+  // výpočet optimálního množství 
+    function calculateOptimalQuantity() {
+        var button = $('#switch_language');
+        var language = (button.text() === 'English version') ? 'Czech' : 'English';
+
+        $.ajax({
+            type: 'GET',
+            url: '/calculate_optimal_quantity',
+            data: { 'language': language },
+            success: function (response) {
+                var quantitiesHtml = "<p> <ul>";
+                var totalCostText = "";
+                var productNameText = "";
+                $('#download_button').prop('disabled', false);
+
+                if (button.text() === 'English version') {
+                    totalCostText = "Celkové náklady na objednávku: ";
+                    productNameText = "Produkt: ";
+                } else {
+                    totalCostText = "Total Order Cost: ";
+                    productNameText = "Product: ";
+                }
+
+                for (var product in response.quantities) {
+                    if (button.text() === 'English version') {
+                        quantitiesHtml += "<li>" + productNameText + product + ", Optimal Quantity: " + response.quantities[product] + "</li>";
+                    } else {
+                        quantitiesHtml += "<li>" + productNameText + product + ", Optimální množství: " + response.quantities[product] + "</li>";
+                    }
+                }
+                quantitiesHtml += "</ul>";
+
+                var totalCostRounded = parseFloat(response.total_cost).toFixed(2);
+                console.log("Rounded Total Cost:", totalCostRounded);
+
+                quantitiesHtml += "<p>" + totalCostText + totalCostRounded + "</p>";
+                $('#optimal_quantities_result').html(quantitiesHtml);
+
+            },
+            error: function (xhr, status, error) {
+                var errorMessage = "Error";
+                if (xhr.status === 400) {
+                    // Bad Request - Possibly due to insufficient or incorrect data
+                    if (button.text() === 'English version') {
+                        errorMessage = "Chyba: Nedostatečná nebo nesprávná data.";
+                    } else {
+                        errorMessage = "Error: Insufficient or incorrect data.";
+                    }
+                } else if (xhr.status === 500) {
+                    // Internal Server Error
+                    if (button.text() === 'English version') {
+                        errorMessage = "Chyba: Nedostatečná nebo nesprávná data.";
+                    } else {
+                        errorMessage = "Error: Insufficient or incorrect data.";
+                    }
+                } else {
+                    // Other errors
+                    var responseMessage = xhr.responseText ? JSON.parse(xhr.responseText).message : "";
+                    errorMessage += ": " + (responseMessage || xhr.statusText);
+                }
+
+                $('#optimal_quantities_result').html(errorMessage);
+            }
+        });
+    }
+
+  // výpočet úrovně obsluhy - znovuobjednávka
+    function calculateServiceQuantity() {
+        $.ajax({
+            type: 'GET',
+            url: '/service_quantity',
+            success: function (response) {
+                var button = $('#switch_language');
+                var quantitiesHtml = "<p> <ul>";
+                var totalCostText = "";
+                var productNameText = "";
+
+                if (button.text() === 'English version') {
+                    totalCostText = "Reorder point at selected service level: ";
+                    productNameText = "Produkt: ";
+                    reorderText = "Bod znovuobjednávky produktů odpovídá bodu znovuobjednávky při zvolené úrovni."
+                    storageCostsText = "Skladovací náklady pojistné zásoby jsou: "
+                    storageCostsDifferenceText = "Rozdíl skladovacích nákladů oproti současnému stavu: "
+                } else {
+                    totalCostText = "Bod znovuobjednávky při zvolené úrovni obsluhy: ";
+                    productNameText = "Product: ";
+                    reorderText = "The product reorder point corresponds to the reorder point at a selected service level."
+                    storageCostsText = "Storage costs of the safety stock are: "
+                    storageCostsDifferenceText = "The difference of storage costs compared to current stock: "
+
+
+                }
+
+                for (var product in response.statistics) {
+                    if (button.text() === 'English version') {
+                        quantitiesHtml += "<li>" + productNameText + product + ", Optimální množství: " + response.reorder_point[product].reorder_quantity + "</li>";
+                    } else {
+                        quantitiesHtml += "<li>" + productNameText + product + ", Optimal quantity:  " + response.reorder_point[product].reorder_quantity + "</li>";
+                    }
+                }
+
+                // Add line for displaying total storage costs
+
+                quantitiesHtml += "</ul>";
+                quantitiesHtml += "<p>" + storageCostsText + parseFloat(response.total_storage_costs).toFixed(2) + "</p>";
+                quantitiesHtml += "<p>" + storageCostsDifferenceText + parseFloat(response.cost_difference).toFixed(2) + "</p>";
+
+                console.log(quantitiesHtml);
+
+
+                $('#service_quantities_result').html(quantitiesHtml);
+            },
+            error: function (xhr, status, error) {
+                var errorMessage = "Error";
+                var button = $('#switch_language');
+                if (xhr.status === 400 || xhr.status === 500) {
+                    errorMessage = (button.text() === 'English version') ? "Error: Insufficient or incorrect data." : "Chyba: Nedostatečná nebo nesprávná data.";
+                } else {
+                    var responseMessage = xhr.responseText ? JSON.parse(xhr.responseText).message : "";
+                    errorMessage += ": " + (responseMessage || xhr.statusText);
+                }
+                $('#service_quantities_result').html(errorMessage);
+            }
+        });
+    }
+
+
+
+
+  // přepnutí jazyků
+
+    function switchToCzech() {
+
+        $('label[for="inventory_file_text"]').text('Vybrat soubor');
+        $('label[for="demand_file_text"]').text('Vybrat soubor');
+        $('label[for="price_discount_file_text"]').text('Vybrat soubor');
+        $('label[data-browse]').attr('data-browse', 'Procházet');
+        $('#inventory_file').text('Zde nahrajte skladové zásoby');
+        $('#demand_file').text('Zde nahrajte poptávku');
+        $('#price_discount_file').text('Zde nahrajte množstevní slevy');
+        $('label[for="integerInput"]').text('Pořizovací lhůta');
+        $('label[for="serviceInput"]').text('Úroveň obsluhy');
+        $('label[for="floatInput"]').text('Úroková míra z půjčky');
+        $('#upload_demand_button').text('Nahrát data');
+        $('#upload_inventory_button').text('Nahrát data');
+        $('#upload_price_discount_button').text('Nahrát data');
+        $('#submit_delivery').text('Potvrdit');
+        $('#submit_percentage').text('Potvrdit');
+        $('#submit_service').text('Potvrdit');
+        $('#show_discount').text('Ukázat nahraný soubor s množstevními slevami');
+        $('#show_demand').text('Ukázat nahraný soubor s poptávkou po produktech');
+        $('#show_inventory').text('Ukázat nahraný soubor se skladovými zásobami');
+        $('#calculate_distribution').text('Určit pravděpodobnostní rozdělení');
+        $('#storage_costs').text('Vypočítat skladovací náklady');
+        $('#statistics_values').text('Vypočítat bod znovuobjednávky a odchylku');
+        $('#optimal_quantities').text('Vypočítat optimální objednávku');
+        $('#optimal_quantities_discount').text('Vypočítat optimální objednávku');
+
+        
+        $('#hide_buttons').text('Skrýt tlačítka');
+        $('#hlavniNadpis h1').text('Aplikace pro optimalizaci řízení zásob')
+        $('#vypocetNadpis h2').text('Výpočet potřebných hodnot')
+        $('#optimal_reorder').text('Vypočítat bod znovuobjednávky při zvolené úrovni obsluhy')
+        $('#download_button').text('Stáhnout optimální objednávku')
+        $('#instructions').text('Návod');
+        $('#discount_usage_yes').text('Ano');
+        $('#discount_usage_no').text('Ne');
+        $('#product_cost').text('Pořizovací náklady (cena za dopravu)');
+        $('#submit_delivery_fee').text('Potvrdit');
+        $('#show_histogram').text('Ukázat histogram s pravděpodobnostním rozdělením');
+        $('#show_qq_plot').text('Ukázat QQ graf s pravděpodobnostním rozdělením');
+        $('#price_discount_existence').text('Používáte diskotní rabaty?');
+        
+
+    }
+
+    function switchLanguage() {
+        var button = $('#switch_language');
+        if (button.text() === 'English version') {
+            switchToEnglish();
+            button.text('Czech version');
+        } else {
+            switchToCzech();
+            button.text('English version');
+        }
+
+
+        updateLanguageDependentFunctions();
+    }
+
+    function updateLanguageDependentFunctions() {
+        if ($('#distribution_result').html().trim() !== '') {
+            calculateDistribution();
+        }
+        if ($('#storage_costs_result').html().trim() !== '') {
+            storageCosts();
+        }
+        if ($('#statistics_result').html().trim() !== '') {
+            calculateStatistics();
+        }
+        if ($('#optimal_quantities_result').html().trim() !== '') {
+            calculateOptimalQuantity();
+        }
+    }
+
+  // přepnutí do aj
+    function switchToEnglish() {
+        // Change all visible text on the page to default language
+        $('label[for="inventory_file_text"]').text('Upload File');
+        $('label[for="demand_file_text"]').text('Upload File');
+        $('label[for="price_discount_file_text"]').text('Upload File');
+        $('#inventory_file').text('Upload CSV file of inventory');
+        $('#demand_file').text('Upload CSV file of demand');
+        $('#price_discount_file').text('Upload a CSV file of quantity sales');
+        $('label[for="integerInput"]').text('Delivery time');
+        $('#upload_demand_button').text('Upload data');
+        $('#upload_inventory_button').text('Upload data');
+        $('#upload_price_discount_button').text('Upload data');
+        $('label[for="floatInput"]').text('Percentage Rate of charge');
+        $('label[for="serviceInput"]').text('Level of service');
+        $('#submit_delivery').text('Submit');
+        $('#submit_percentage').text('Submit');
+        $('#submit_service').text('Submit');
+        $('#show_demand').text('Show demand data');
+        $('#show_inventory').text('Show inventory data');
+        $('#show_discount').text('Show quantity discount data');
+        $('label[data-browse]').attr('data-browse', 'Browse');
+        $('#calculate_distribution').text('Determine probability distribution');
+        $('#storage_costs').text('Determine storage costs');
+        $('#statistics_values').text('Determine mean and standard deviation');
+        $('#optimal_quantities').text('Determine optimal order');
+        $('#optimal_quantities_discount').text('Determine optimal order');
+        $('#hlavniNadpis h1').text('Software for inventory optimization')
+        $('#optimal_reorder').text('Determine re-order point at a service level')
+        $('#download_button').text('Download optimal order')
+        $('#hide_buttons').text('Hide buttons');
+        $('#instructions').text('Instructions');
+        $('#vypocetNadpis h2').text('Calculation');
+        $('#discount_usage_yes').text('Yes');
+        $('#discount_usage_no').text('No');
+        $('#product_cost').text('Purchase costs (delivery fee)');
+        $('#submit_delivery_fee').text('Submit');
+        $('#show_histogram').text('Show histogram with probability distribution');
+        $('#show_qq_plot').text('Show QQ plot with probability distribution');
+        $('#price_discount_existence').text('Do you use price discount?');
+
+
+
+
+    }
+      // ukázka nahraných dat
+
+    function showDemandData() {
+        window.open('/show_data_demand', '_blank');
+    }
+    function showInventoryData() {
+        window.open('/show_data_inventory', '_blank');
+    }
+    function showDiscountData() {
+        window.open('/show_data_discount', '_blank');
+    }
+
+    function downloadXLSX() {
+        window.location.href = '/download_file';
+    }
+
+
+</script>
+</body>
+
+</html>

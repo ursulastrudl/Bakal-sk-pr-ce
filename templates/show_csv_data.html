@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/aplikace_styl.css') }}" media="screen">
+    <title>Optimalizace řízení zásob</title>
+    <meta charset="UTF-8">
+
+</head>
+<body>
+	<div id="hlavniNadpis">
+	<h1>Nahraná data</h1></div>
+	<br>
+    <div class="table-container"> 
+        {{ data_var|safe }} 
+    </div>
+	</body>
+</html>

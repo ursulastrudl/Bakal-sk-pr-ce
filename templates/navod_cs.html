@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html> 
+	<head>
+		<title>Návod - Optimalizace řízení zásob</title>
+		<meta charset="UTF-8">
+		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/aplikace_styl.css') }}" media="screen">
+	 
+	</head>
+<body> 
+<div class="container-fluid">
+	
+	<div id="hlavniNadpis">
+ <h1>Návod k použití aplikace</h1></div>
+ <button type="button" class="btn btn-primary btn-sm" id="hide_buttons" onclick="showApp()">Zpět</button>
+<p></p>
+ <h2>Popis aplikace</h2>
+ <p>Aplikace slouží k optimalizaci řízení zásob ve vašem podniku. Podle vtupních dat je schopna vypočítat skladovací náklady na objednávku. Dále je na základě vstupních dat schopna vygenerovat
+	optimální objednávku pro daný podnik.
+<h2>Nahrání vstupních dat</h2>
+<p>Data se nahrávají ze zařízení uživatele přímo do aplikace pomocí grafického uživatelského rozhraní.</p>
+<h3>Formát dat</h3>
+	<p>Uživatel ne vstupu aplikace nahrává tři soubory v CSV formátu. Všechny soubory musí být být odděleny středníkem a mít UTF 8 kódování.</p><p>Soubor s poptávkou musí obsahovat sloupec s názvem produktu.
+	Ostatní sloupce musí obsahovat čísla udávající spotřebu kusů v daných dnech. Na základě tohoto souboru aplikace určuje pravděpodobnostní rozdělení spotřeby/poptávky po jednotlivých produktech.</p>
+	<p>Dále uživatel nahrává CSV soubor se svými skladobvými zásobami. Ten musí obsahovat tři sloupce. První sloupec opět musí obsahovat název produktu, druhý jeho současný počet na skladě a třetí jeho pořizovací cenu.</p>
+	<p>Třetí soubor se týká množstevních rabat. Obsahuje tři sloupce - v prvním je uvedena dolní hranice slevové skupiny, v druhém horní skupina a ve třetím potom samotná sleva.</p>
+	<p>Pokud chce uživatel v CSV souboru mít desetinná čísla, musí použít desetinnou tečku.</p>
+	<p>Dále uživatel musí zadat pořizovací lhůtu (doba od vytvoření objednávky po její doručení), úrokovou míru (o tu jsou zvýšeny skladovací náklady) v procentech, pořizovací náklady (zpravidla jde o poplatek za dopravu) v používané měně a také úroveň obsluhy.
+		Úroveň obsluhy značí pravděpodobnost s jakou dojde k uspokojení zákazníků. Udává se v procentech. Tím pádem čím více procent (například 90), tím vyšší pravděpodobnost, že nedojde k nedostatku zásob.</p>
+	
+		<h2>Výpočet potřebných dat</h2>
+		<p>Pomocí jednotlivých tlačítek si uživatel spočítá potřebné funkce. </p>
+		<h3>Pravděpodobnostní rozdělení</h3>
+		<p>Pro určení pravděpodobnostního rozdělení je nutné nahrát do aplikacec CSV soubor se spotřebou/poptávkou po produktech. Poté si uživatel pomocí tlačítek "Ukázat histogram s pravděpodobnostním rozdělením" a "Ukázat Q-Q graf s pravděpodobnostním rozdělením"
+			 může zobrazit jak histogram, tak QQ graf nahraných dat. Pokud si nechce
+			zobrazovat grafické znázornění dat, může kliknout na tlačítko "Určit pravděpodobnostní rozdělení", kde si pomocí statistických testů zobrazí, jaké pravděpodobnostní rozdělení má každá poptávka po produktech.
+		</p>
+		<h3>Skladovací náklady</h3>
+		<p>Pro výpočet skladovacích nákladů je třeba, aby uživatel nahrál CSV soubor se skladovými zásobami a také úrokovou míru z půjčky. Poté může kliknout na tlačítko "Vypočítat skladovací náklady". Aplikace bu zobrazí skladovací náklady pro každý produkt a jejich sumu.</p>
+		<h3>Bod znovuobjednávky a výběrová směrodatná odchylka</h3>
+		<p>Bod znovuobjednávky je možné spočítat buď při současném stavu skladu, či při zvolené úrovni znovuobjednávky. 
+			Pro vypočítání bodu znovuobjednávky při současném stavu skladu musí uživatel nahrát CSV soubor se spotřebou a pořizovací lhůtu. Bod znovuobjednávky bude odpovídat 50% úrovně obsluhy. Funkce zvládne spočítat i výběrovou směrodatnou odchylku poptávky po produktech.
+			 Pokud chce uživatel spočítat bod znovuobjednávky při zvolené úrovni obsluhy, musí zadat i tu.
+		</p>
+		<h3>Bod znovuobjednávky a výběrová směrodatná odchylka</h3>
+		<p>Bod znovuobjednávky je možné spočítat buď při současném stavu skladu, či při zvolené úrovni znovuobjednávky. 
+			Pro vypočítání bodu znovuobjednávky při současném stavu skladu musí uživatel nahrát CSV soubor se spotřebou a pořizovací lhůtu. Bod znovuobjednávky bude odpovídat 50% úrovně obsluhy. Funkce zvládne spočítat i výběrovou směrodatnou odchylku poptávky po produktech.
+			 Pokud chce uživatel spočítat bod znovuobjednávky při zvolené úrvoni obsluhy, musí zadat i tu.
+		</p>
+		<h3>Vygenerování optimální objednávky</h3>
+		<p>Pro vygenerování optimální objednávky musí uživatel nahrát následující údaje:
+			<ul>
+			<li>CSV soubor s poptávkou po produktech</li>
+			<li>CSV soubor se skladovými zásobami</li>	
+			<li>Úroková míra z půjčky</li>
+			<li>Pořizovací lhůta</li>	
+			<li>Pořizovací náklady</li>	
+			</ul>
+
+		</p>
+		<h3>Staýení výsledného souboru</h3>
+		<p>Po kliknutí na tlačítko s vygenerováním optimální objednávky, si může uživatel objednávku stáhnout v XLSX formátu.</p>
+		<p>Pokud chce uživatel vygenerovat optimální objednávku při použití diskontních rabat, musí kromě výše uvedených dat nahrát i CSV soubor s diskontními rabaty.</p>	
+	
+
+ 
+	 
+ 
+</div>
+</body> 
+</html>
+
+<script>
+	function showApp() {
+		window.open('/show_app', '_blank');
+	
+	}
+</script>
